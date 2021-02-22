@@ -19,7 +19,7 @@ export class ScaleString extends ByteArray {
 
     private _valueStr: string;
 
-    constructor (input = "") {
+    constructor (input: string = "") {
         super([]);
         this._valueStr = input;
 

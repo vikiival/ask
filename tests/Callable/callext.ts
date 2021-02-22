@@ -4,7 +4,7 @@
  * @author liangqin.fan@gmail.com
  */
 
-import { Bool, UInt8 } from "as-scale-codec";
+import { Bool, UInt8 } from "../../assembly/deps/as-scale-codec";
 import { Storage } from "../../assembly/storage";
 import { Log } from "../../assembly/utils/Log";
 import { ReturnData } from "../../assembly/primitives/returndata";

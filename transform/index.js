@@ -4,7 +4,7 @@ const {getContractInfo} = require('./dist/contract');
 
 class MyTransform extends Transform {
     afterInitialize(program) {
-    // TODO: support cli args
+    // TODO: support cli args, see https://github.com/AssemblyScript/assemblyscript/issues/1691
         let source = program.sources[0];
         // TODO: make sure the semantics
         for (let src of program.sources) {
