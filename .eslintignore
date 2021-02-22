@@ -1,4 +1,11 @@
-examples/
+# we ignore examples lint now
+examples
+
 # ignore codegen now
 **/codegen
-dpes/**/*
+
+# we ignore js lint now
+**/*.js
+
+# TODO: The deps should move out or clone from submodule. 
+deps/**/*
