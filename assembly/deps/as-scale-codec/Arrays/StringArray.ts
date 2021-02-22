@@ -32,7 +32,7 @@ export class StringArray extends AbstractArray<ScaleString, string>{
         return new DecodedData<string>(
             ScaleString.fromU8a(value.slice(0, encodedStringLength)).toString(),
             encodedStringLength
-        )
+        );
     }
 
     /**

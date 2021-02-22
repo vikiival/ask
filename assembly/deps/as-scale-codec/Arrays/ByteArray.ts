@@ -46,7 +46,7 @@ export class ByteArray extends AbstractArray<Byte, u8> {
         return new DecodedData<u8>(
             scaleByte.unwrap(),
             scaleByte.encodedLength()
-        )
+        );
     }
 
     /**

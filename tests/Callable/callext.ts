@@ -22,62 +22,62 @@ var msg: Msg = new Msg();
 
 class CallExt {
 
-  onDeploy(): void {
+    onDeploy(): void {
 
-  }
-
-  callOutside(): void {
-    let outcontract: u8[] = [];
-    // call a function:  msg(bool, u8);
-    let data = Abi.encode("msg", [new Bool(true), new UInt8(12)]);
-    let callable = new Callable(outcontract);
-    let ret = callable.gas(88888).value(0).data(data).call();
-    if (ret == ReturnCode.Success) {
-      let r = callable.callResult();
-      // do something with result of calling method
     }
-  }
+
+    callOutside(): void {
+        let outcontract: u8[] = [];
+        // call a function:  msg(bool, u8);
+        let data = Abi.encode("msg", [new Bool(true), new UInt8(12)]);
+        let callable = new Callable(outcontract);
+        let ret = callable.gas(88888).value(0).data(data).call();
+        if (ret == ReturnCode.Success) {
+            let r = callable.callResult();
+            // do something with result of calling method
+        }
+    }
 }
 
 
 export function deploy(): i32 {
-  // const selector = arryToHexString(fnSelector);
-  // Log.println("deploy.fnSelctor: " + selector);
+    // const selector = arryToHexString(fnSelector);
+    // Log.println("deploy.fnSelctor: " + selector);
 
-  const ctorWithParams: u8[] = [0xd1, 0x83, 0x51, 0x2b]; // 0xd183512b
-  const ctorWithoutParams: u8[] = [0x6a, 0x37, 0x12, 0xe2]; // 0x6a3712e2
+    const ctorWithParams: u8[] = [0xd1, 0x83, 0x51, 0x2b]; // 0xd183512b
+    const ctorWithoutParams: u8[] = [0x6a, 0x37, 0x12, 0xe2]; // 0x6a3712e2
 
-  let callext = new CallExt();
+    let callext = new CallExt();
 
-  if (msg.isSelector(ctorWithParams)) {
-    callext.onDeploy();
-  } else if (msg.isSelector(ctorWithoutParams)) {
-    callext.onDeploy();
-  } else {
+    if (msg.isSelector(ctorWithParams)) {
+        callext.onDeploy();
+    } else if (msg.isSelector(ctorWithoutParams)) {
+        callext.onDeploy();
+    } else {
     // nop
-  }
+    }
 
-  // Log.println("flipper.deploy executed");
-  return 0;
+    // Log.println("flipper.deploy executed");
+    return 0;
 }
 
 export function call(): i32 {
-  // const selector = arryToHexString(fnSelector);
-  // Log.println("call.fnSelctor: " + selector);
+    // const selector = arryToHexString(fnSelector);
+    // Log.println("call.fnSelctor: " + selector);
 
-  const flp = new CallExt();
-  const flipselector: u8[] = [0xc0, 0x96, 0xa5, 0xf8]; // "c096a5f3";
+    const flp = new CallExt();
+    const flipselector: u8[] = [0xc0, 0x96, 0xa5, 0xf8]; // "c096a5f3";
 
 
-  // Step2: exec command
-  if (msg.isSelector(flipselector)) { // flip operation
-    flp.callOutside();
-  } else {
-    if (msg.notPayable()) {
-      // call fallback() {}
+    // Step2: exec command
+    if (msg.isSelector(flipselector)) { // flip operation
+        flp.callOutside();
     } else {
-      // call receive() {}
+        if (msg.notPayable()) {
+            // call fallback() {}
+        } else {
+            // call receive() {}
+        }
     }
-  }
-  return 0;
+    return 0;
 }

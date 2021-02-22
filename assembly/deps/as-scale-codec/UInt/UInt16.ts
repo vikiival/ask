@@ -19,7 +19,7 @@ import { BIT_LENGTH, Bytes } from "../utils/Bytes";
 export class UInt16 extends AbstractInt<u16>  {
 
     constructor (value: u16 = 0) {
-        super(value, BIT_LENGTH.INT_16)
+        super(value, BIT_LENGTH.INT_16);
     }
 
     /**

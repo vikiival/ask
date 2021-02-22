@@ -11,15 +11,15 @@ export class FnParameters {
   private datas: Array<u8>;
 
   constructor(u: u8[]) {
-    this.datas = u;
-    this.pos = 0;
+      this.datas = u;
+      this.pos = 0;
   }
 
   get<T extends Codec>(): T {
-    let ins = instantiate<T>();
-    ins.populateFromBytes(this.datas, this.pos);
-    this.pos += ins.encodedLength();
-    return ins;
+      let ins = instantiate<T>();
+      ins.populateFromBytes(this.datas, this.pos);
+      this.pos += ins.encodedLength();
+      return ins;
 
   }
 }

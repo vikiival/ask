@@ -8,9 +8,9 @@ import { seal_return } from "../seal/seal0";
 import { WriteBuffer } from "./writebuffer";
 
 export class ReturnData {
-  static set<T extends Codec>(v: T): void {
-    const wbuf = new WriteBuffer(v.toU8a().buffer);
+    static set<T extends Codec>(v: T): void {
+        const wbuf = new WriteBuffer(v.toU8a().buffer);
 
-    seal_return(0, wbuf.buffer, wbuf.size);
-  }
+        seal_return(0, wbuf.buffer, wbuf.size);
+    }
 }

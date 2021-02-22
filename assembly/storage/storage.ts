@@ -15,44 +15,44 @@ export class Storage<T extends Codec> {
   private key: string;
 
   constructor(_key: string) {
-    this.key = _key;
+      this.key = _key;
   }
 
   store(value: T): ReturnCode {
-    const buf = new WriteBuffer(value.toU8a().buffer);
-    seal_set_storage(
-      this.hashKey(),
-      buf.buffer,
-      buf.size
-    );
-    return ReturnCode.Success;
+      const buf = new WriteBuffer(value.toU8a().buffer);
+      seal_set_storage(
+          this.hashKey(),
+          buf.buffer,
+          buf.size
+      );
+      return ReturnCode.Success;
   }
 
   load(): T {
-    const value = instantiate<T>();
-    const len = value.encodedLength();
+      const value = instantiate<T>();
+      const len = value.encodedLength();
 
-    const readBuf = new ReadBuffer(len);
-    const status = seal_get_storage(
-      this.hashKey(),
-      readBuf.valueBuffer,
-      readBuf.sizeBuffer
-    );
-    // if read storage from native successfully, then populate it.
-    // otherwise let it alon with default constructed value.
-    if (status == ReturnCode.Success && readBuf.readSize <= len) {
-      value.populateFromBytes(readBuf.valueBytes, 0);
-    }
+      const readBuf = new ReadBuffer(len);
+      const status = seal_get_storage(
+          this.hashKey(),
+          readBuf.valueBuffer,
+          readBuf.sizeBuffer
+      );
+      // if read storage from native successfully, then populate it.
+      // otherwise let it alon with default constructed value.
+      if (status == ReturnCode.Success && readBuf.readSize <= len) {
+          value.populateFromBytes(readBuf.valueBytes, 0);
+      }
 
-    return value;
+      return value;
   }
 
   clear(): void {
-    seal_clear_storage(this.hashKey());
+      seal_clear_storage(this.hashKey());
   }
 
   private hashKey(): ArrayBuffer {
-    const hash = Crypto.blake256s(this.key);
-    return hash.toU8a().buffer;
+      const hash = Crypto.blake256s(this.key);
+      return hash.toU8a().buffer;
   }
 }

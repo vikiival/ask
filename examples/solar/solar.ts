@@ -1,12 +1,14 @@
+import { u128 } from 'as-bignum';
 /**
  * All Rights Reserved by Patract Labs.
  * @author liangqin.fan@gmail.com
  */
 
+
 @storage
 class Planets {
-  name: string;
-  radius: u32;
+  name: string = "";
+  radius: u32 = "";
   isdwarf: boolean;
 }
 
@@ -30,6 +32,7 @@ class SolarSystem {
     if (this.stored.name != name) {
       this.stored.name = name;
       this.stored.radius = radius;
+
       this.stored.isdwarf = isdwarf;
     }
   }

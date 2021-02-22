@@ -20,11 +20,11 @@ export class BaseContract {
    * @memberof BaseContract
    */
   get msg(): Msg {
-    if (this._msg === null) {
-      this._msg = new Msg();
-    }
+      if (this._msg === null) {
+          this._msg = new Msg();
+      }
 
-    return this._msg;
+      return this._msg;
   }
 
   /**
@@ -35,12 +35,12 @@ export class BaseContract {
    * @memberof BaseContract
    */
   get address(): AccountId {
-    if (this._address === null) {
-      let readbuf = new ReadBuffer(32);
-      seal_address(readbuf.valueBuffer, readbuf.sizeBuffer);
-      this._address = AccountId.from(readbuf.valueBytes);
-    }
+      if (this._address === null) {
+          let readbuf = new ReadBuffer(32);
+          seal_address(readbuf.valueBuffer, readbuf.sizeBuffer);
+          this._address = AccountId.from(readbuf.valueBytes);
+      }
 
-    return this._address;
+      return this._address;
   }
 }

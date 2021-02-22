@@ -94,7 +94,7 @@ export class ScaleUInt128 implements UnwrappableCodec<u128> {
 
         const value = bytes.slice(index + 1, byteLength + index + 1);
         Bytes.appendZeroBytes(value, BIT_LENGTH.INT_128);
-        return u128.fromBytesLE(value)
+        return u128.fromBytesLE(value);
     }
 
     /**

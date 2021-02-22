@@ -19,7 +19,7 @@ import { BIT_LENGTH, Bytes } from "../utils/Bytes";
 export class Int64 extends AbstractInt<i64> {
 
     constructor (value: i64 = 0) {
-        super(value, BIT_LENGTH.INT_64)
+        super(value, BIT_LENGTH.INT_64);
     }
 
     /** 

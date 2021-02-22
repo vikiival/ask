@@ -30,7 +30,7 @@ export class BoolArray extends AbstractArray<Bool, bool> {
         return new DecodedData<bool>(
             scaleBool.unwrap(),
             scaleBool.encodedLength()
-        )
+        );
     }
     
     /**

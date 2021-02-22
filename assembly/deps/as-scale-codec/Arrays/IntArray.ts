@@ -30,7 +30,7 @@ export class IntArray extends AbstractArray<CompactInt, i64> {
         return new DecodedData<u64>(
             compactInt.unwrap(),
             compactInt.encodedLength()
-        )
+        );
     }
 
     /**

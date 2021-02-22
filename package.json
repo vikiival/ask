@@ -18,24 +18,19 @@
   },
   "devDependencies": {
     "@as-pect/assembly": "^4.0.0",
-    "@as-pect/cli": "^4.0.0",
-    "@as-pect/core": "^4.0.0",
+    "assemblyscript": "0.18",
+    "@as-pect/cli": "^6.0.0",
+    "@as-pect/core": "^6.0.0",
     "@assemblyscript/loader": "^0.16.1",
     "@types/node": "^14.14.12",
     "@typescript-eslint/eslint-plugin": "^4.14.0",
     "@typescript-eslint/parser": "^4.9.1",
     "eslint": "^7.15.0",
-    "source-map-support": "^0.5.19",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.2"
   },
   "dependencies": {
     "as-bignum": "^0.2.14",
-    "binaryen": "98.0.0-nightly.20201109",
-    "blake2": "^4.0.1",
-    "handlebars": "^4.7.6",
-    "long": "^4.0.0",
-    "source-map-support": "^0.5.19",
-    "ts-node": "^6.2.0"
+    "ts-node": "9"
   }
 }

@@ -31,7 +31,7 @@ export class UInt128Array extends AbstractArray<ScaleUInt128, u128> {
         return new DecodedData<u128>(
             u128Instance.unwrap(),
             u128Instance.encodedLength()
-        )
+        );
     }
 
     /**

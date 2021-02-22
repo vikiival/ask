@@ -12,25 +12,25 @@ export class ReadBuffer {
   private sizeBuf: SizeBuffer;
 
   static readInstance<T extends Codec>(fn: (valueBuf: ArrayBuffer, sizeBuf: ArrayBuffer) => void ): T {
-    let v = instantiate<T>();
-    let readbuf = new ReadBuffer(v.encodedLength());
-    fn(readbuf.valueBuffer, readbuf.sizeBuffer);
-    v.populateFromBytes(readbuf.valueBytes, 0);
+      let v = instantiate<T>();
+      let readbuf = new ReadBuffer(v.encodedLength());
+      fn(readbuf.valueBuffer, readbuf.sizeBuffer);
+      v.populateFromBytes(readbuf.valueBytes, 0);
 
-    return v;
+      return v;
   }
 
   constructor(bufSize: u32 = 1024) {
-    this.valueBuf = new Uint8Array(bufSize);
-    this.sizeBuf = new SizeBuffer(bufSize);
+      this.valueBuf = new Uint8Array(bufSize);
+      this.sizeBuf = new SizeBuffer(bufSize);
   }
 
   get valueBytes(): u8[] {
-    return this.toU8a(this.valueBuf);
+      return this.toU8a(this.valueBuf);
   }
 
   get readSize(): i32 {
-    return this.sizeBuf.value as i32;
+      return this.sizeBuf.value as i32;
   }
 
   get valueBuffer(): ArrayBuffer { return this.valueBuf.buffer; }
@@ -38,6 +38,6 @@ export class ReadBuffer {
   get sizeBuffer(): ArrayBuffer { return this.sizeBuf.buffer; }
 
   private toU8a(typedArr: Uint8Array): u8[] {
-    return typedToArray(typedArr, this.readSize);
+      return typedToArray(typedArr, this.readSize);
   }
 }

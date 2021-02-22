@@ -18,79 +18,79 @@ export class Msg {
   private _isMutates: bool = true;
 
   set mutates(mu: bool) {
-    this._isMutates = mu;
+      this._isMutates = mu;
   }
 
   get value(): u128 {
-    if (this._value === null) {
-      this._value = ReadBuffer.readInstance<UInt128>(seal_value_transferred);
-    }
-    return this._value!.unwrap();
+      if (this._value === null) {
+          this._value = ReadBuffer.readInstance<UInt128>(seal_value_transferred);
+      }
+      return this._value!.unwrap();
   }
 
   get sender(): u8[] {
-    if (this._sender === null) {
-      let readbuf = new ReadBuffer(32);
-      seal_caller(readbuf.valueBuffer, readbuf.sizeBuffer);
-      this._sender = readbuf.valueBytes;
-    }
+      if (this._sender === null) {
+          let readbuf = new ReadBuffer(32);
+          seal_caller(readbuf.valueBuffer, readbuf.sizeBuffer);
+          this._sender = readbuf.valueBytes;
+      }
 
-    return this._sender!;
+      return this._sender!;
   }
 
   get sig(): u8[] {
-    if (this._sig === null) {
-      this.init_sig_and_data();
-    }
-    return this._sig!;
+      if (this._sig === null) {
+          this.init_sig_and_data();
+      }
+      return this._sig!;
   }
 
   get data(): u8[] {
-    if (this._data === null) {
-      this.init_sig_and_data();
-    }
-    return this._data!;
+      if (this._data === null) {
+          this.init_sig_and_data();
+      }
+      return this._data!;
   }
 
   notPayable(): bool {
-    return this.value == u128.Zero;
+      return this.value == u128.Zero;
   }
 
   denyPayment(): void {
-    assert(this.value === u128.Zero, "It is a none payable function.")
+      assert(this.value === u128.Zero, "It is a none payable function.");
   }
 
   isSelector(selector: u8[]): bool {
-    if (this.sig.length != selector.length) return false;
-    return memory.compare(
-      changetype<usize>(this.sig.buffer),
-      changetype<usize>(selector.buffer),
-      4) == 0;
+      if (this.sig.length != selector.length) return false;
+      return memory.compare(
+          changetype<usize>(this.sig.buffer),
+          changetype<usize>(selector.buffer),
+          4) == 0;
   }
 
   private init_sig_and_data(): void {
-    if (this._sig === null || this._data === null) {
-      const reader = MessageInputReader.readInput();
-      if (this._sig === null) {
-        this._sig = new Array<u8>(4);
-        memory.copy(
-          changetype<usize>(this._sig!.buffer),
-          changetype<usize>(reader.fnSelector.buffer),
-          4);
-      }
+      if (this._sig === null || this._data === null) {
+          const reader = MessageInputReader.readInput();
+          if (this._sig === null) {
+              this._sig = new Array<u8>(4);
+              memory.copy(
+                  changetype<usize>(this._sig!.buffer),
+                  changetype<usize>(reader.fnSelector.buffer),
+                  4);
+          }
 
-      const datalen = reader.fnParameters.length;
-      if (this._data === null) {
-        if (datalen > 0) {
-          this._data = new Array<u8>(datalen);
-          memory.copy(
-            changetype<usize>(this._data!.buffer),
-            changetype<usize>(reader.fnParameters.buffer),
-            datalen);
-        } else {
-          this._data = [];
-        }
+          const datalen = reader.fnParameters.length;
+          if (this._data === null) {
+              if (datalen > 0) {
+                  this._data = new Array<u8>(datalen);
+                  memory.copy(
+                      changetype<usize>(this._data!.buffer),
+                      changetype<usize>(reader.fnParameters.buffer),
+                      datalen);
+              } else {
+                  this._data = [];
+              }
+          }
       }
-    }
   }
 }

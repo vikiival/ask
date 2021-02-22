@@ -7,11 +7,11 @@ export class WriteBuffer {
   private valueBuf: Uint8Array;
 
   constructor(u8a: ArrayBuffer) {
-    this.valueBuf = Uint8Array.wrap(u8a);
+      this.valueBuf = Uint8Array.wrap(u8a);
   }
 
   get size(): u32 {
-    return this.valueBuf.length;
+      return this.valueBuf.length;
   }
 
   get buffer(): ArrayBuffer { return this.valueBuf.buffer; }

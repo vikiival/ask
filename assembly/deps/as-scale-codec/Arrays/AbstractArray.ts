@@ -36,11 +36,11 @@ export abstract class AbstractArray<ScaleType extends Codec, NativeType> impleme
 
     public eq(other: AbstractArray<ScaleType, NativeType>): bool{
         return ArrayUtils.areArraysEqual(this.values, other.values);
-    };
+    }
     
     public notEq(other: AbstractArray<ScaleType, NativeType>): bool{
         return !ArrayUtils.areArraysEqual(this.values, other.values);
-    };
+    }
     
     /**
     * @description  Encodes values of all elements in u8[] successively as per the SCALE codec specification
