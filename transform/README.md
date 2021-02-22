@@ -1,14 +1,7 @@
-# codegen
+# Transform
 
-目标: 将 annotation 展开, 生成目标可编译文件.
+```sh
+npx asc ./examples/solar/solar.ts --transform ./transform/index.js  --noEmit
+```
 
-<!-- TODO: need to fix the usage -->
-
-使用方式:
-
-1. 在项目根目录下, 安装依赖: `npm install`
-2. 编译示例项目: `./assembly/codegen/bin/asc  ./examples/preprocess/origin.ts -p ./examples/preprocess/pre.ts -a ./examples/preprocess/abi.json` 
-
-状态:
-
-1. 支持@contract 和@storage
+注意： 由于 asc 实现的似乎有导入问题， 需要使用 transform 下的 asc，即 ./transform/node_modules/assemblyscript/bin/asc

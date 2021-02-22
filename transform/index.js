@@ -1,13 +1,12 @@
 const { Transform } = require("assemblyscript/cli/transform");
-const { SourceKind, ElementKind } = require("assemblyscript");
 const preprocess = require('./preprocess');
-const {getContractInfo} = require('./dist/src/contract');
+const {getContractInfo} = require('./dist/contract');
 
 class MyTransform extends Transform {
     afterInitialize(program) {
     // TODO: support cli args
-        this.log("[ask] afterInitialize called");
         let source = program.sources[0];
+        // TODO: make sure the semantics
         for (let src of program.sources) {
             if (src.sourceKind === 1 && src.simplePath !== "index-incremental") {
                 source = src;
@@ -19,6 +18,7 @@ class MyTransform extends Transform {
         let out = preprocess.outputCode(source.text, info);
         this.log(source.normalizedPath);
         // this.writeFile("original.ts", source.text, __dirname); 
+        // TODO: config
         this.writeFile("target/extension.ts", out, __dirname);
         this.writeFile("target/metadata.json", abi, __dirname);
     }  
