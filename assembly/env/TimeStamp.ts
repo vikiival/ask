@@ -5,4 +5,4 @@
 
 import { UInt64 } from "../deps/as-scale-codec";
 
-export type TimeStamp = UInt64;
+export type Timestamp = UInt64;

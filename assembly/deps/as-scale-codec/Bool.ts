@@ -45,7 +45,7 @@ export class Bool implements UnwrappableCodec<bool> {
      * @param bytes SCALE encoded bytes
      * @param index index to start decoding the bytes from
      */
-    public populateFromBytes(bytes: u8[], index: i32 = 0): void{
+    public populateFromBytes(bytes: u8[], index: i32 = 0): void {
         assert(bytes.length > 0 && (bytes[index] == 1 || bytes[index] == 0), 'Bool: Cannot decode invalid input');
         this._value = bytes[index] == 1;
     }

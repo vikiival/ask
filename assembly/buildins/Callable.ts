@@ -9,7 +9,6 @@ import { WriteBuffer } from "../primitives/writebuffer";
 import { seal_call } from "../seal/seal0";
 import { UInt128, UInt64 } from "../deps/as-scale-codec/";
 import { u128 } from "as-bignum";
-import { ValueType } from "../env/ValueType";
 
 export class Callable {
   private _callee: u8[] | null = null;

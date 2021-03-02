@@ -17,21 +17,22 @@ import { AccountType } from "./AccountType";
 
 export type BalanceType = UInt128;
 
-export function SendBalance(destination: AccountType, value: BalanceType): bool {
-  let destBuffer = new WriteBuffer(destination.buffer);
-  let valBuffer = new WriteBuffer(value.toU8a().buffer);
+// TODO: define a interface for AccountType
+// export function SendBalance(destination: AccountType, value: BalanceType): bool {
+//   let destBuffer = new WriteBuffer(destination.buffer);
+//   let valBuffer = new WriteBuffer(value.toU8a().buffer);
 
-  let ret = seal_transfer(
-    destBuffer.buffer,
-    destBuffer.size,
-    valBuffer.buffer,
-    valBuffer.size
-  );
+//   let ret = seal_transfer(
+//     destBuffer.buffer,
+//     destBuffer.size,
+//     valBuffer.buffer,
+//     valBuffer.size
+//   );
 
-  return ret === ReturnCode.Success;
-}
+//   return ret === ReturnCode.Success;
+// }
 
-export function TransferBalance(destination: AccountType, value: BalanceType): void {
-  let status = SendBalance(destination, value);
-  assert(status, "Transfer balance reverted.");
-}
+// export function TransferBalance(destination: AccountType, value: BalanceType): void {
+//   let status = SendBalance(destination, value);
+//   assert(status, "Transfer balance reverted.");
+// }

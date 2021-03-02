@@ -3,7 +3,7 @@
  * @author liangqin.fan@gmail.com
  */
 
-import { AccountType, BalanceType, TransferBalance } from "../env";
+import { AccountType } from "../env";
 import { ReturnCode } from "../primitives/alias";
 import { Callable } from "./Callable";
 import { u128 } from "as-bignum";
@@ -25,11 +25,6 @@ export class AccountId implements Codec {
 
   static from(uarr: u8[]): AccountId {
     return new AccountId(uarr);
-  }
-
-  // transfer from `contract.address` to this.account
-  transfer(value: BalanceType): void {
-    TransferBalance(this._id, value);
   }
 
   call(data: u8[], gas: u64 = 0, value: u128 = u128.Zero): u8[] {

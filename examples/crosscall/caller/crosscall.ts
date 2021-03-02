@@ -14,7 +14,6 @@ import {
   UInt32,
   ReturnData,
   Log,
-  Gas
 } from "../../../assembly/";
 /*
 * This is the contract template,
