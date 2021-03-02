@@ -20,13 +20,18 @@ export interface EnvBackend {
         key: K
     ): Result<V, WrapReturnCode>;
 
-    clearContractStroage(key: Key): void;
+    clearContractStroage(key: IKey): void;
 
     decodeInput<V extends Codec>(): Result<V, WrapReturnCode>;
 
     returnValue<V extends Codec>(flags: u32, value: V): void;
 
+    println(content: string): void;
+
     // TODO: add more methods
+    
+    // hashBytes<H extends Codec>
+    // call_chain_extension()
 }
 
 // TODO: find a way to define a generic interface
@@ -51,6 +56,10 @@ export interface TypedEnvBackend extends EnvBackend {
 
     tombstoneDeposit<T extends Codec>(): Result<T, WrapReturnCode>;
 
+    transfer<A extends Codec, B extends Codec>(dest: A, value: B): void;
+
+    // TODO: add more methods
+
     // emitEvent<T extends Codec, Event>(): void;
 
     // setRentAllowance<T extends Codec>(newValue: T): void;
@@ -63,8 +72,6 @@ export interface TypedEnvBackend extends EnvBackend {
 
     // terminateContract<T extends Codec>(beneficiary: T): void;
 
-    // transfer<A extends Codec, B extends Codec>(dest: A, value: B): void;
 
-    // TODO: add more methods
 }
 

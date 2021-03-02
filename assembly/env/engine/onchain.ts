@@ -1,16 +1,21 @@
 import { ReadBuffer } from "../../primitives/readbuffer";
 import { AccountId } from "../../buildins/AccountId";
 import {
+    seal_address,
     seal_balance,
     seal_caller,
     seal_clear_storage,
     seal_gas_left,
     seal_get_storage,
     seal_input,
+    seal_minimum_balance,
     seal_println,
+    seal_rent_allowance,
     seal_return,
     seal_set_storage,
+    seal_transfer,
     seal_value_transferred,
+    seal_now,
 } from "../../seal/seal0";
 import { BalanceType } from "../BalanceType";
 import { Codec } from "../../deps";
@@ -82,13 +87,13 @@ export class EnvInstance implements TypedEnvBackend {
         return Result.Ok(ReadBuffer.readInstance<V>(seal_input));
     }
 
-    println(content: string): void {
-        seal_println(changetype<ArrayBuffer>(content), content.length);
-    }
-
     returnValue<V extends Codec>(flags: number, value: V): void {
         let valBytes = value.toU8a();
         seal_return(flags, valBytes.buffer, valBytes.length);
+    }
+
+    println(content: string): void {
+        seal_println(changetype<ArrayBuffer>(content), content.length);
     }
 
     // TypedEnvBackend
@@ -107,32 +112,56 @@ export class EnvInstance implements TypedEnvBackend {
         );
     }
 
+    transfer<A extends Codec, B extends Codec>(dest: A, value: B): void {
+        const destBytes = dest.toU8a();
+        const valueBytes = value.toU8a();
+        seal_transfer(destBytes.buffer, destBytes.length, valueBytes.buffer, valueBytes.length);
+    }
+
     // TODO:
     gasLeft<T extends Codec>(): Result<T, WrapReturnCode> {
-        throw new Error("Method not implemented.");
+        return Result.Ok<T, WrapReturnCode>(
+            ReadBuffer.readInstance<T>(seal_gas_left)
+        );
     }
+
     blockTimestamp<T extends Codec>(): Result<T, WrapReturnCode> {
-        throw new Error("Method not implemented.");
+        return Result.Ok<T, WrapReturnCode>(
+            ReadBuffer.readInstance<T>(seal_now)
+        );
     }
+
     accountId<T extends Codec>(): Result<T, WrapReturnCode> {
-        throw new Error("Method not implemented.");
+        return Result.Ok<T, WrapReturnCode>(
+            ReadBuffer.readInstance<T>(seal_address)
+        );
     }
+
     balance<T extends Codec>(): Result<T, WrapReturnCode> {
-        throw new Error("Method not implemented.");
+        return Result.Ok<T, WrapReturnCode>(
+            ReadBuffer.readInstance<T>(seal_balance)
+        );
     }
+
     rentAllowance<T extends Codec>(): Result<T, WrapReturnCode> {
-        throw new Error("Method not implemented.");
+        return Result.Ok<T, WrapReturnCode>(
+            ReadBuffer.readInstance<T>(seal_rent_allowance)
+        );
     }
+
     minimumBalance<T extends Codec>(): Result<T, WrapReturnCode> {
-        throw new Error("Method not implemented.");
+        return Result.Ok<T, WrapReturnCode>(
+            ReadBuffer.readInstance<T>(seal_minimum_balance)
+        );
     }
+
     tombstoneDeposit<T extends Codec>(): Result<T, WrapReturnCode> {
         throw new Error("Method not implemented.");
     }
 
-    blockNumber<B extends Codec>(): Result<B, WrapReturnCode> {
-        return Result.Ok<B, WrapReturnCode>(
-            ReadBuffer.readInstance<B>(seal_balance)
+    blockNumber<T extends Codec>(): Result<T, WrapReturnCode> {
+        return Result.Ok<T, WrapReturnCode>(
+            ReadBuffer.readInstance<T>(seal_balance)
         );
     }
 }
