@@ -13,6 +13,18 @@ export interface Env {
     env(): TypedEnvBackend;
 }
 
+
+export interface CallInput extends Codec {
+    /**
+     * @description Return SCALE encoded selector
+     */
+    functionSelctor(): u8[];
+    /**
+     * @description Return SCALE encoded args
+     */
+    arguments(): u8[];
+}
+
 export interface EnvBackend {
     setContractStorage<K extends IKey, V extends Codec>(key: K, value: V): void;
 
@@ -30,7 +42,8 @@ export interface EnvBackend {
 
     // TODO: add more methods
     
-    // hashBytes<H extends Codec>
+    // hashBytes
+
     // call_chain_extension()
 }
 
@@ -58,6 +71,12 @@ export interface TypedEnvBackend extends EnvBackend {
 
     transfer<A extends Codec, B extends Codec>(dest: A, value: B): void;
 
+    call<A extends Codec, B extends Codec, I extends CallInput, T extends Codec>(
+        callee: A,
+        gasLimit: u64,
+        transferredValue: B,
+        input: I,
+    ): Result<T, WrapReturnCode>;
     // TODO: add more methods
 
     // emitEvent<T extends Codec, Event>(): void;
@@ -71,7 +90,6 @@ export interface TypedEnvBackend extends EnvBackend {
     // restoreContract<A extends Codec, H extends Codec, B extends Codec> (accountId: A, codeHash: H, rentAllowance: B, filteredKeys: Array<IKey>): void;
 
     // terminateContract<T extends Codec>(beneficiary: T): void;
-
 
 }
 

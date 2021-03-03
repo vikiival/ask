@@ -8,8 +8,8 @@ import { SizeBuffer } from "./sizebuffer";
  */
 
 export class ReadBuffer {
-  private valueBuf: Uint8Array;
-  private sizeBuf: SizeBuffer;
+  private readonly valueBuf: Uint8Array;
+  private readonly sizeBuf: SizeBuffer;
 
   static readInstance<T extends Codec>(fn: (valueBuf: ArrayBuffer, sizeBuf: ArrayBuffer) => void ): T {
     let v = instantiate<T>();

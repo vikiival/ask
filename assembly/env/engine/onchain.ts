@@ -1,5 +1,4 @@
 import { ReadBuffer } from "../../primitives/readbuffer";
-import { AccountId } from "../../buildins/AccountId";
 import {
     seal_address,
     seal_balance,
@@ -16,30 +15,32 @@ import {
     seal_transfer,
     seal_value_transferred,
     seal_now,
+    seal_tombstone_deposit,
+    seal_call,
 } from "../../seal/seal0";
 import { BalanceType } from "../BalanceType";
 import { Codec } from "../../deps";
 import { ReturnCode } from "../../primitives/alias";
 
 import { Result } from "../../utils";
-import { IKey, TypedEnvBackend, WrapReturnCode } from "./backend";
-
+import { CallInput, IKey, TypedEnvBackend, WrapReturnCode } from "./backend";
+import { Wrap } from "../../utils/wrap";
+import { SizeBuffer } from "../../primitives/sizebuffer";
 
 export function env(): EnvInstance {
     return EnvInstance.env;
 }
 
-
 /**
- * On-chain env for ask. Preprocess should use this for onchain mode.
+ * On-chain env for ask!. Preprocess should use this for on-chain mode.
  */
 export class EnvInstance implements TypedEnvBackend {
     public static readonly env: EnvInstance = new EnvInstance();
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     constructor() {}
-    
-    // EnvBackend
+
+    /* EnvBackend */
 
     setContractStorage<K extends IKey, V extends Codec>(
         key: K,
@@ -66,7 +67,7 @@ export class EnvInstance implements TypedEnvBackend {
         );
 
         if (code != ReturnCode.Success) {
-            return Result.Err(code);
+            return Result.Err(Wrap.from(code));
         }
 
         // if read storage from native successfully, then populate it.
@@ -96,7 +97,8 @@ export class EnvInstance implements TypedEnvBackend {
         seal_println(changetype<ArrayBuffer>(content), content.length);
     }
 
-    // TypedEnvBackend
+    /* TypedEnvBackend */
+
     caller<A extends Codec>(): Result<A, WrapReturnCode> {
         return Result.Ok<A, WrapReturnCode>(
             ReadBuffer.readInstance<A>(seal_caller)
@@ -115,10 +117,14 @@ export class EnvInstance implements TypedEnvBackend {
     transfer<A extends Codec, B extends Codec>(dest: A, value: B): void {
         const destBytes = dest.toU8a();
         const valueBytes = value.toU8a();
-        seal_transfer(destBytes.buffer, destBytes.length, valueBytes.buffer, valueBytes.length);
+        seal_transfer(
+            destBytes.buffer,
+            destBytes.length,
+            valueBytes.buffer,
+            valueBytes.length
+        );
     }
 
-    // TODO:
     gasLeft<T extends Codec>(): Result<T, WrapReturnCode> {
         return Result.Ok<T, WrapReturnCode>(
             ReadBuffer.readInstance<T>(seal_gas_left)
@@ -156,12 +162,45 @@ export class EnvInstance implements TypedEnvBackend {
     }
 
     tombstoneDeposit<T extends Codec>(): Result<T, WrapReturnCode> {
-        throw new Error("Method not implemented.");
+        return Result.Ok<T, WrapReturnCode>(
+            ReadBuffer.readInstance<T>(seal_tombstone_deposit)
+        );
     }
 
     blockNumber<T extends Codec>(): Result<T, WrapReturnCode> {
         return Result.Ok<T, WrapReturnCode>(
             ReadBuffer.readInstance<T>(seal_balance)
         );
+    }
+
+    // TODO: refine it
+    call<A extends Codec, B extends Codec, I extends CallInput, T extends Codec>(
+        callee: A,
+        gasLimit: u64,
+        transferredValue: B,
+        input: I,
+    ): Result<T, WrapReturnCode> {
+        const calleeBytes = callee.toU8a();
+        const valueBytes = transferredValue.toU8a();
+        const inputBytes = input.toU8a();
+
+        const output = instantiate<T>();
+        // TODO: resize the buffer
+        const len = output.encodedLength();
+        const outputBytes = new Array<u8>(len);
+        const outputLenBytes = new SizeBuffer(len);
+        seal_call(
+            calleeBytes.buffer,
+            calleeBytes.length,
+            gasLimit,
+            valueBytes.buffer,
+            valueBytes.length,
+            inputBytes.buffer,
+            inputBytes.length,
+            outputBytes.buffer,
+            outputLenBytes.buffer,
+        );
+        output.populateFromBytes(outputBytes, 0);
+        return Result.Ok<T, WrapReturnCode>(output);
     }
 }
