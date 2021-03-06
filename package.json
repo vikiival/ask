@@ -9,29 +9,27 @@
     "smart-contract",
     "substrate"
   ],
-  "main": "./assembly/index.ts",
-  "author": "",
+  "workspaces": [
+    "packages/*"
+  ],
   "license": "MIT",
   "scripts": {
     "lint": "eslint .",
     "test": "asp --verbose",
     "test:summary": "asp --summary"
   },
+
+  "private": true,
   "devDependencies": {
-    "@as-pect/assembly": "^4.0.0",
+    "@as-pect/assembly": "^6.0.0",
     "assemblyscript": "0.18",
     "@as-pect/cli": "^6.0.0",
     "@as-pect/core": "^6.0.0",
-    "@assemblyscript/loader": "^0.16.1",
+    "@assemblyscript/loader": "^0.18",
     "@types/node": "^14.14.12",
-    "@typescript-eslint/eslint-plugin": "^4.14.0",
-    "@typescript-eslint/parser": "^4.9.1",
-    "eslint": "^7.15.0",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.1.2"
-  },
-  "dependencies": {
-    "as-bignum": "^0.2.14",
-    "ts-node": "9"
+    "@typescript-eslint/eslint-plugin": "^4.16",
+    "@typescript-eslint/parser": "^4.16",
+    "eslint": "^7.21.0",
+    "ts-node": "^9.1.1"
   }
 }
