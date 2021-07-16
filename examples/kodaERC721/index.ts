@@ -36,4 +36,24 @@ class MyERC721 extends ERC721 {
   setBaseURI(baseURI: string): void {
     this._setBaseURI(baseURI);
   }
+
+  @message
+  setRoyalty(tokenId: u128, amount: u8): void {
+    this._addRoyalty(tokenId, amount);
+  }
+
+  @message
+  emote(tokenId: u128, data: string): void {
+    this._emote(tokenId, data);
+  }
+
+  @message
+  list(tokenId: u128, amount: u128): void {
+    this._list(tokenId, amount);
+  }
+
+  @message
+  buy(tokenId: u128): void {
+    this._buy(tokenId);
+  }
 }

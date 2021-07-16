@@ -211,6 +211,14 @@ export class ERC721 {
     this._transfer(from, to, tokenId);
   }
 
+  @message
+  transfer(to: AccountId, tokenId: u128): void {
+    assert(this._isOwner(tokenId), "ERC721: transfer caller is not owner");
+    const from = msg.sender;
+    this._list(tokenId, u128.Zero);
+    this._transfer(from, to, tokenId);
+  }
+
   /**
    * @dev See {IERC721-safeTransferFrom}.
    */
