@@ -1,4 +1,5 @@
 import { AccountId, AccountId0, Bool, msg, ScaleString, SpreadStorableArray, SpreadStorableMap, u128, UInt128, UInt8, StorableArray } from "ask-lang";
+import { Transfer, Approval, ApprovalForAll, Emoted, RoyaltySet, Listed } from './event';
 
 @storage
 class ERC721Storage {
@@ -25,53 +26,9 @@ class ERC721Storage {
   // auto-counter
   _counter: u128;
   // emotes -> because we can
-  _emotes: SpreadStorableMap<UInt128, SpreadStorableMap<AccountId, StorableArray<ScaleString>>>;
-}
-
-/**
-  * @dev Emitted when `tokenId` token is transferred from `from` to `to`.
-  */
-@event class Transfer {
-  @topic from: AccountId = AccountId0;
-  @topic to: AccountId = AccountId0;
-  @topic tokenId: u128 = u128.Zero;
-
-  constructor(from: AccountId, to: AccountId, tokenId: u128) {
-    this.from = from;
-    this.to = to;
-    this.tokenId = tokenId;
-  }
-};
-
-/**
- * @dev Emitted when `owner` enables `approved` to manage the `tokenId` token.
- */
-@event class Approval {
-  @topic owner: AccountId;
-  @topic approved: AccountId;
-  @topic tokenId: u128;
-
-  constructor(owner: AccountId, approved: AccountId, tokenId: u128) {
-    this.owner = owner;
-    this.approved = approved;
-    this.tokenId = tokenId;
-  }
-}
-
-/**
- * @dev Emitted when `owner` enables or disables (`approved`) `operator` to manage all of its assets.
- */
-@event class ApprovalForAll {
-  @topic owner: AccountId;
-  @topic operator: AccountId;
-
-  approved: bool;
-
-  constructor(owner: AccountId, operator: AccountId, approved: bool) {
-    this.owner = owner;
-    this.operator = operator;
-    this.approved = approved;
-  }
+  _emotes: SpreadStorableMap<UInt128, SpreadStorableMap<AccountId, ScaleString>>;
+  // price of the NFT
+  _balances: SpreadStorableMap<UInt128, UInt128>;
 }
 
 @contract
@@ -337,11 +294,15 @@ export class ERC721 {
 
   protected _isOwner(tokenId: u128): bool {
     let owner = this.ownerOf(tokenId);
-    return owner === msg.sender;
+    return owner.eq(msg.sender);
   }
 
-  protected _addRoyalty(tokenId: u128, _royalty: u16): void {
-    assert(!this._isOwner(tokenId), "KODA: Not owner");
+  protected _addRoyalty(tokenId: u128, _royalty: u8): void {
+    assert(!this._isOwner(tokenId) && this.storage._owner === msg.sender, "KODA: Not owner");
+    assert(_royalty < 100, 'KODA: Cannot have royalty more than 100 percent');
+    let id = new UInt128(tokenId);
+    this.storage._tokenRoyalty.set(id, new UInt8(_royalty));
+    (new RoyaltySet(msg.sender, tokenId, _royalty));
   }
 
   /**
@@ -450,5 +411,32 @@ export class ERC721 {
   protected _approve(to: AccountId, tokenId: u128): void {
     this.storage._tokenApprovals.set(new UInt128(tokenId), to);
     (new Approval(this.ownerOf(tokenId), to, tokenId));
+  }
+
+  protected _emote(tokenId: u128, data: string): void {
+    this.storage._emotes.get(new UInt128(tokenId)).set(msg.sender, new ScaleString(data));
+    (new Emoted(msg.sender, tokenId, data));
+  }
+
+  protected _buy(tokenId: u128): void {
+    const value = this.storage._balances.get(new UInt128(tokenId)).unwrap();
+    const owner = this.ownerOf(tokenId);
+    const issuer = this.storage._owner;
+    assert(value > u128.Zero, "KODA: NFT not for sale");
+    assert(!this._isOwner(tokenId), "KODA: Washtrading 101");
+    const royaltyFee = this.storage._tokenRoyalty.get(new UInt128(tokenId)).unwrap();
+    const royalty = u128.muldiv(value, u128.fromU32(royaltyFee), u128.fromU32(100));
+    assert(u128.ge(msg.value, u128.add(value, royalty)), "KODA: Not enuf balance");
+    this._list(tokenId, u128.Zero);
+    owner.transfer(new UInt128(value))
+    const rest = u128.sub(msg.value, value)
+    issuer.transfer(new UInt128(rest))
+    this._transfer(owner, msg.sender, tokenId);
+  }
+
+  protected _list(tokenId: u128, amount: u128): void {
+    assert(this._isOwner(tokenId), "KODA: Not owner");
+    this.storage._balances.set(new UInt128(tokenId), new UInt128(amount));
+    (new Listed(msg.sender, tokenId, amount));
   }
 }
