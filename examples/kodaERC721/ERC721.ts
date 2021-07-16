@@ -294,7 +294,7 @@ export class ERC721 {
     let counter = this.storage._counter;
     this._mint(msg.sender, counter);
     this._setTokenURI(counter, _tokenURI);
-    counter= this.storage._counter + u128.One;
+    counter= u128.add(this.storage._counter, u128.One);
     this.storage._counter = counter;
     // TODO: finish
     // this._addRoyalty(counter, _royalty);

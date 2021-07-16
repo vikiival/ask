@@ -52,7 +52,7 @@ class MyERC721 extends ERC721 {
     this._list(tokenId, amount);
   }
 
-  @message
+  @message(payable, mutates = true)
   buy(tokenId: u128): void {
     this._buy(tokenId);
   }
