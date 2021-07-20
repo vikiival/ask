@@ -454,25 +454,32 @@ export class ERC721 {
   }
 
   // // TODO: _buy still broken
-  protected _buy(tokenId: u128): void {
-    const value = this.storage._balances.get(new UInt128(tokenId)).unwrap();
-    const owner = this.ownerOf(tokenId);
-    const issuer = this.storage._owner;
-    assert(value !== u128.Zero, "KODA: NFT not for sale");
-    assert(u128.ge(msg.value, value), "KODA: Not enuf balance");
-    // const royaltyFee = this.storage._tokenRoyalty.get(new UInt128(tokenId)).unwrap();
-    // const royalty = u128.muldiv(value, u128.fromU32(royaltyFee), u128.fromU32(100));
-    // assert(u128.ge(msg.value, u128.add(value, royalty)), "KODA: Not enuf balance");
-    this._transfer(owner, msg.sender, tokenId);
+  // protected _buy(tokenId: u128): void {
+  //   const value = this.storage._balances.get(new UInt128(tokenId)).unwrap();
+  //   const owner = this.ownerOf(tokenId);
+  //   const issuer = this.storage._owner;
+  //   assert(value !== u128.Zero, "KODA: NFT not for sale");
+  //   assert(u128.ge(msg.value, value), "KODA: Not enuf balance");
+  //   // const royaltyFee = this.storage._tokenRoyalty.get(new UInt128(tokenId)).unwrap();
+  //   // const royalty = u128.muldiv(value, u128.fromU32(royaltyFee), u128.fromU32(100));
+  //   // assert(u128.ge(msg.value, u128.add(value, royalty)), "KODA: Not enuf balance");
+  //   this._transfer(owner, msg.sender, tokenId);
 
-    if (owner.eq(issuer)) {
-      owner.transfer(new UInt128(msg.value))  
-    } else {
-      owner.transfer(new UInt128(value))
-      const rest = u128.sub(msg.value, value)
-      issuer.transfer(new UInt128(rest))
-    }
+  //   if (owner.eq(issuer)) {
+  //     owner.transfer(new UInt128(msg.value))  
+  //   } else {
+  //     owner.transfer(new UInt128(value))
+  //     const rest = u128.sub(msg.value, value)
+  //     issuer.transfer(new UInt128(rest))
+  //   }
     
+  //   this._list(tokenId, u128.Zero);
+  // }
+
+  protected _buy(tokenId: u128): void {
+    const owner = this.ownerOf(tokenId);
+    this._transfer(owner, msg.sender, tokenId);
+    owner.transfer(new UInt128(msg.value))
     this._list(tokenId, u128.Zero);
   }
 
@@ -485,6 +492,7 @@ export class ERC721 {
 
   protected _list(tokenId: u128, amount: u128): void {
     assert(this._isOwner(tokenId), "KODA: Not owner");
+    this._approve(AccountId0, tokenId); // Need to approve smart contract or hack it!
     this.storage._balances.set(new UInt128(tokenId), new UInt128(amount));
     (new Listed(msg.sender, tokenId, amount));
   }
