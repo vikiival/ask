@@ -1,4 +1,4 @@
-import { AccountId, AccountId0, Bool, msg, ScaleString, SpreadStorableArray, SpreadStorableMap, u128, UInt128, UInt8, StorableArray } from "ask-lang";
+import { AccountId, AccountId0, Bool, msg, ScaleString, SpreadStorableArray, SpreadStorableMap, u128, UInt128, UInt8, BalanceType } from "ask-lang";
 import { Transfer, Approval, ApprovalForAll, Emoted, RoyaltySet, Listed } from './event';
 
 @storage
@@ -28,7 +28,7 @@ class ERC721Storage {
   // emotes -> because we can
   _emotes: SpreadStorableMap<UInt128, SpreadStorableMap<AccountId, ScaleString>>;
   // price of the NFT
-  _balances: SpreadStorableMap<UInt128, UInt128>;
+  _balances: SpreadStorableMap<UInt128, BalanceType>;
 }
 
 @contract
@@ -109,6 +109,33 @@ export class ERC721 {
     if (tokenURI.length > 0) return this.storage._baseURI + tokenURI;
     // If there is a baseURI but no tokenURI, concatenate the tokenID to the baseURI.
     return this.storage._baseURI + id.toString();
+  }
+
+  @message(mutates = false)
+  priceOf(tokenId: u128): u128 {
+    assert(this._exists(tokenId), "ERC721Metadata: Cannot query value");
+
+    let id = new UInt128(tokenId);
+    let balance = this.storage._balances.get(id).unwrap();
+    return balance;
+  }
+
+  @message(mutates = false)
+  emoteOf(to: AccountId, tokenId: u128): string {
+    assert(this._exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+    let id = new UInt128(tokenId);
+    let emote = this.storage._emotes.get(id).get(to).toString();
+    return emote;
+  }
+
+
+  @message(mutates = false)
+  royaltyOf(tokenId: u128): string {
+    assert(this._exists(tokenId), "ERC721Metadata: Cannot query value");
+
+    let id = new UInt128(tokenId);
+    let balance = this.storage._tokenRoyalty.get(id).toString();
+    return balance;
   }
 
   /**
@@ -426,20 +453,34 @@ export class ERC721 {
     (new Emoted(msg.sender, tokenId, data));
   }
 
+  // // TODO: _buy still broken
   protected _buy(tokenId: u128): void {
     const value = this.storage._balances.get(new UInt128(tokenId)).unwrap();
     const owner = this.ownerOf(tokenId);
     const issuer = this.storage._owner;
-    assert(value > u128.Zero, "KODA: NFT not for sale");
-    assert(!this._isOwner(tokenId), "KODA: Washtrading 101");
-    const royaltyFee = this.storage._tokenRoyalty.get(new UInt128(tokenId)).unwrap();
-    const royalty = u128.muldiv(value, u128.fromU32(royaltyFee), u128.fromU32(100));
-    assert(u128.ge(msg.value, u128.add(value, royalty)), "KODA: Not enuf balance");
-    this._list(tokenId, u128.Zero);
-    owner.transfer(new UInt128(value))
-    const rest = u128.sub(msg.value, value)
-    issuer.transfer(new UInt128(rest))
+    assert(value !== u128.Zero, "KODA: NFT not for sale");
+    assert(u128.ge(msg.value, value), "KODA: Not enuf balance");
+    // const royaltyFee = this.storage._tokenRoyalty.get(new UInt128(tokenId)).unwrap();
+    // const royalty = u128.muldiv(value, u128.fromU32(royaltyFee), u128.fromU32(100));
+    // assert(u128.ge(msg.value, u128.add(value, royalty)), "KODA: Not enuf balance");
     this._transfer(owner, msg.sender, tokenId);
+
+    if (owner.eq(issuer)) {
+      owner.transfer(new UInt128(msg.value))  
+    } else {
+      owner.transfer(new UInt128(value))
+      const rest = u128.sub(msg.value, value)
+      issuer.transfer(new UInt128(rest))
+    }
+    
+    this._list(tokenId, u128.Zero);
+  }
+
+  protected _send(to: AccountId): void {
+      to.transfer(new UInt128(msg.value))
+    // this.storage._balances.set(new UInt128(tokenId), new UInt128(msg.value));
+    // const owner = this.ownerOf(tokenId);
+    // owner.transfer(new UInt128(msg.value))
   }
 
   protected _list(tokenId: u128, amount: u128): void {
