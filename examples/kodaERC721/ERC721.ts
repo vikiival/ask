@@ -455,8 +455,8 @@ export class ERC721 {
 
   // // TODO: _buy still broken
   // protected _buy(tokenId: u128): void {
-  //   const value = this.storage._balances.get(new UInt128(tokenId)).unwrap();
-  //   const owner = this.ownerOf(tokenId);
+    // const value = this.storage._balances.get(new UInt128(tokenId)).unwrap();
+    // const owner = this.ownerOf(tokenId);
   //   const issuer = this.storage._owner;
   //   assert(value !== u128.Zero, "KODA: NFT not for sale");
   //   assert(u128.ge(msg.value, value), "KODA: Not enuf balance");
@@ -478,6 +478,9 @@ export class ERC721 {
 
   protected _buy(tokenId: u128): void {
     const owner = this.ownerOf(tokenId);
+    const price = this.storage._balances.get(new UInt128(tokenId)).unwrap();
+    assert(price > u128.Zero, "KODA: NFT not for sale");
+    assert(msg.value >= price, "KODA: Not enuf balance");
     this._transfer(owner, msg.sender, tokenId);
     owner.transfer(new UInt128(msg.value))
     this._list(tokenId, u128.Zero);

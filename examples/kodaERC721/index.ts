@@ -19,6 +19,7 @@ class MyERC721 extends ERC721 {
 
   @message
   transfer(to: AccountId, tokenId: u128): void {
+    this._safeList(tokenId, u128.Zero)
     this._transfer(msg.sender, to, tokenId);
   }
 
