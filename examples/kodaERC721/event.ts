@@ -90,11 +90,11 @@ import { AccountId, AccountId0, u128 } from "ask-lang";
  export class Listed {
   @topic from: AccountId = AccountId0;
   @topic tokenId: u128 = u128.Zero;
-  @topic amount: u128 = u8.MIN_VALUE;
+  @topic amount: string = '';
 
-  constructor(from: AccountId, tokenId: u128, amount: u128) {
+  constructor(from: AccountId, tokenId: u128, amount: string) {
     this.from = from;
-    this.amount = amount;
     this.tokenId = tokenId;
+    this.amount = amount;
   }
 };

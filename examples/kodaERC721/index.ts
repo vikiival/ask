@@ -49,7 +49,7 @@ class MyERC721 extends ERC721 {
 
   @message
   list(tokenId: u128, amount: u128): void {
-    this._list(tokenId, amount);
+    this._safeList(tokenId, amount);
   }
 
   @message(payable)

@@ -490,10 +490,13 @@ export class ERC721 {
     // owner.transfer(new UInt128(msg.value))
   }
 
-  protected _list(tokenId: u128, amount: u128): void {
+  protected _safeList(tokenId: u128, amount: u128): void {
     assert(this._isOwner(tokenId), "KODA: Not owner");
-    this._approve(AccountId0, tokenId); // Need to approve smart contract or hack it!
+    this._list(tokenId, amount);
+  }
+
+  protected _list(tokenId: u128, amount: u128): void {
     this.storage._balances.set(new UInt128(tokenId), new UInt128(amount));
-    (new Listed(msg.sender, tokenId, amount));
+    (new Listed(msg.sender, tokenId, amount.toString()));
   }
 }
