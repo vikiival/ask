@@ -197,6 +197,15 @@ export class ERC721 {
     return this.storage._tokenApprovals.get(new UInt128(tokenId));
   }
 
+  // DEV: should be fixed in v0.3?
+  // @message(mutates = false)
+  // allEmotes(tokenId: u128): ScaleString[] {
+  //   assert(this._exists(tokenId), "ERC721: approved query for nonexistent token");
+
+  //   const emote = this.storage._emotes.get(new UInt128(tokenId)).allValues()
+  //   return emote;
+  // }
+
   /**
    * @dev See {IERC721-setApprovalForAll}.
    */
@@ -333,7 +342,9 @@ export class ERC721 {
   }
 
   protected _addRoyalty(tokenId: u128, _royalty: u8): void {
-    assert(!this._isOwner(tokenId) && this.storage._owner === msg.sender, "KODA: Not owner");
+    assert(this._isOwner(tokenId), "KODA: Not owner");
+    assert(msg.sender.eq(this.storage._owner) , "KODA: Not owner");
+    
     assert(_royalty < 100, 'KODA: Cannot have royalty more than 100 percent');
     let id = new UInt128(tokenId);
     this.storage._tokenRoyalty.set(id, new UInt8(_royalty));
@@ -477,13 +488,25 @@ export class ERC721 {
   // }
 
   protected _buy(tokenId: u128): void {
+    assert(this._exists(tokenId), "Token does not exist");
     const owner = this.ownerOf(tokenId);
     const price = this.storage._balances.get(new UInt128(tokenId)).unwrap();
     assert(price > u128.Zero, "KODA: NFT not for sale");
     assert(msg.value >= price, "KODA: Not enuf balance");
     this._transfer(owner, msg.sender, tokenId);
-    owner.transfer(new UInt128(msg.value))
     this._list(tokenId, u128.Zero);
+    const royaltyFee = this.storage._tokenRoyalty.get(new UInt128(tokenId)).unwrap();
+    const issuer = this.storage._owner;
+    if (royaltyFee > 0 && issuer.notEq(owner)) {
+      const royalty = u128.muldiv(price, u128.fromU32(royaltyFee), u128.fromU32(100));
+      assert(msg.value >= u128.add(price, royalty), "KODA: Not enuf balance");
+      owner.transfer(new UInt128(price))
+      const rest = u128.sub(msg.value, price)
+      issuer.transfer(new UInt128(rest))
+    } else {
+      owner.transfer(new UInt128(msg.value))
+    }
+    
   }
 
   protected _send(to: AccountId): void {
@@ -499,6 +522,7 @@ export class ERC721 {
   }
 
   protected _list(tokenId: u128, amount: u128): void {
+    assert(this._exists(tokenId), "Token does not exist");
     this.storage._balances.set(new UInt128(tokenId), new UInt128(amount));
     (new Listed(msg.sender, tokenId, amount.toString()));
   }
